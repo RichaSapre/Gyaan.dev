@@ -4,23 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Design Flashcard Quizzer</title>
+    <title>Gyaan.dev</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --card-face-bg: rgba(255, 255, 255, 0.95);
+            --card-back-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 243, 245, 0.95) 100%);
+            --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1e23;
+            --text-secondary: #57606a;
+            --accent-primary: #0969da;
+            --accent-gradient: linear-gradient(135deg, #7928ca 0%, #ff0080 100%);
+            --success: #1a7f37;
+            --warning: #9a6700;
+            --danger: #cf222e;
+            --transition-speed: 0.6s;
+        }
+
+        [data-theme="dark"] {
             --bg-color: #0d1117;
             --card-bg: rgba(22, 27, 34, 0.8);
+            --card-face-bg: rgba(22, 27, 34, 0.95);
+            --card-back-bg: linear-gradient(135deg, rgba(22, 27, 34, 0.95) 0%, rgba(33, 38, 45, 0.95) 100%);
+            --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
             --card-border: rgba(255, 255, 255, 0.1);
             --text-primary: #f0f6fc;
             --text-secondary: #8b949e;
             --accent-primary: #58a6ff;
-            --accent-gradient: linear-gradient(135deg, #7928ca 0%, #ff0080 100%);
             --success: #238636;
             --warning: #d29922;
             --danger: #f85149;
-            --transition-speed: 0.6s;
         }
 
         * {
@@ -46,10 +64,35 @@
             margin-bottom: 2.5rem;
             max-width: 800px;
             width: 100%;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            border-color: var(--accent-primary);
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 0.5rem;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
@@ -87,7 +130,8 @@
 
         .filter-btn:hover {
             border-color: var(--accent-primary);
-            color: var(--text-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
         }
 
         .filter-btn.active {
@@ -154,6 +198,14 @@
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card.flipped:hover {
+            transform: translateY(-5px);
+        }
+
         .card.flipped .card-front {
             display: none;
         }
@@ -172,17 +224,18 @@
             padding: 40px 32px;
             border-radius: 28px;
             border: 1px solid var(--card-border);
-            background: rgba(22, 27, 34, 0.95);
+            background: var(--card-face-bg);
             backdrop-filter: blur(14px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            box-shadow: var(--card-shadow);
             text-align: center;
             min-height: 480px;
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
         .card-back {
             display: none;
-            background: linear-gradient(135deg, rgba(22, 27, 34, 0.95) 0%, rgba(33, 38, 45, 0.95) 100%);
+            background: var(--card-back-bg);
         }
 
         .card.flipped .card-back {
@@ -266,8 +319,9 @@
 
         .btn-submit:hover {
             background: var(--accent-primary);
-            color: white;
+            color: #ffffff;
             box-shadow: 0 0 15px rgba(88, 166, 255, 0.4);
+            transform: translateY(-2px);
         }
 
         .btn-ask-ai {
@@ -288,6 +342,7 @@
         .btn-ask-ai:hover {
             background: rgba(88, 166, 255, 0.15);
             border-color: var(--accent-primary);
+            transform: translateY(-2px);
         }
 
         .hint-box {
@@ -353,6 +408,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            transition: all 0.3s ease;
         }
 
         .btn-again {
@@ -363,7 +419,9 @@
 
         .btn-again:hover {
             background: var(--warning);
-            color: white;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(210, 153, 34, 0.3);
         }
 
         .btn-gotit {
@@ -374,7 +432,9 @@
 
         .btn-gotit:hover {
             background: var(--success);
-            color: white;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
         }
 
         .btn-shuffle {
@@ -387,6 +447,9 @@
 
         .btn-shuffle:hover {
             border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
         /* Score Screen */
@@ -508,7 +571,8 @@
 <body>
 
     <header>
-        <h1>System Design Quizzer</h1>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">☀️</button>
+        <h1>Gyaan.dev</h1>
         <p class="subtitle">Master technical architectures with interactive flashcards</p>
     </header>
 
@@ -671,8 +735,21 @@
         const nudgeText = document.getElementById('nudgeText');
         const loader = document.getElementById('loader');
 
-        // Placeholder for Gemini API Key - User should provide this
         const GEMINI_API_KEY = 'AIzaSyDl-ZkX1vfDtI-rvZh6ZdPx888FV0EEkEY';
+
+        // Theme Toggle Logic
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            document.getElementById('themeToggle').textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize Theme Mode preference (default to light)
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
 
         function initQuiz() {
             currentIndex = 0;
