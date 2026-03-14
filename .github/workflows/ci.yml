@@ -1,0 +1,63 @@
+name: System Design Quizzer CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check if index.html exists
+      run: |
+        if [ ! -f index.html ]; then
+          echo "Error: index.html not found!"
+          exit 1
+        fi
+        echo "index.html exists."
+
+    - name: Validate DOCTYPE declaration
+      run: |
+        if ! head -n 1 index.html | grep -qi "<!DOCTYPE html>"; then
+          echo "Error: index.html is missing a DOCTYPE declaration!"
+          exit 1
+        fi
+        echo "DOCTYPE declaration found."
+
+    - name: Check file size
+      run: |
+        FILESIZE=$(stat -c%s "index.html")
+        MAXSIZE=1048576 # 1MB
+        echo "File size: $FILESIZE bytes"
+        if [ $FILESIZE -gt $MAXSIZE ]; then
+          echo "Error: File size is too large ($FILESIZE bytes). Limit is $MAXSIZE bytes."
+          exit 1
+        fi
+        echo "File size is within limits."
+
+    - name: Verify category names
+      run: |
+        CATEGORIES=(
+          "Networking and Delivery"
+          "Scalability"
+          "Storage and Data"
+          "AI and ML Infrastructure"
+          "Software Engineering Fundamentals"
+          "System Design Concepts"
+        )
+        for cat in "${CATEGORIES[@]}"; do
+          if ! grep -q "$cat" index.html; then
+            echo "Error: Category '$cat' not found in index.html!"
+            exit 1
+          fi
+          echo "Category '$cat' verified."
+        done
+
+    - name: Final Success Message
+      run: echo "🎉 All checks passed! System Design Quizzer is ready for deployment."
